@@ -1,0 +1,58 @@
+
+import java.util.Arrays;
+
+import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.streaming.StreamingQuery;
+import org.apache.spark.sql.types.DataTypes;
+import org.apache.spark.sql.types.StructField;
+import org.apache.spark.sql.types.StructType;
+import org.apache.spark.api.java.function.FlatMapFunction;
+import org.apache.spark.sql.Dataset;
+import org.apache.spark.sql.Encoders;
+import org.apache.spark.sql.Row;
+import org.apache.spark.sql.streaming.Trigger;
+
+
+public final class CSVwritestreaming {
+public static void main(String[] args) throws Exception {
+		SparkSession spark = SparkSession
+			  .builder()
+			  .appName("JavaStructuredNetworkWordCount")
+			  .getOrCreate();
+		
+		StructType MySchema = DataTypes.createStructType(new StructField[] {
+				DataTypes.createStructField("key1", DataTypes.StringType, true),
+				DataTypes.createStructField("key2", DataTypes.StringType, true),
+	            DataTypes.createStructField("key3",  DataTypes.StringType, true)
+	    });
+		
+		
+		Dataset<Row> df = spark
+				  .readStream()
+				  .format("csv")
+				  .option("header", "true")
+				  .schema(MySchema)
+				  .csv("/home/heeguk/csvhere");
+
+		/*
+		 StreamingQuery query = df.writeStream()
+				  .format("csv")
+				  .option("path","/home/heeguk/csvhere2")
+				  .option("checkpointLocation", "/home/heeguk/csvhere2/checkpoint")
+				  .trigger(Trigger.ProcessingTime("5 seconds"))
+				  .start();
+		 */
+     // 체크포인트 위치 지정안하면 실행이 안됨
+     // 실시간으로 write 해주는 곳의 위치를 read 해주는 곳과 꼭 다르게 해줘함.
+		StreamingQuery query = df.writeStream()
+				  .format("csv")
+				  .option("path","/home/heeguk/csvhere2")
+				  .option("checkpointLocation", "/home/heeguk/csvhere2/checkpoint")
+				  .start();
+		
+		
+		
+		query.awaitTermination();
+
+  }
+}
