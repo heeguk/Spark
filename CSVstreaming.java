@@ -1,5 +1,3 @@
-package spark1;
-
 import java.util.Arrays;
 
 import org.apache.spark.sql.SparkSession;
@@ -13,7 +11,7 @@ import org.apache.spark.sql.Encoders;
 import org.apache.spark.sql.Row;
 
 
-public final class JavaWordCount {
+public final class CSVstreaming {
 public static void main(String[] args) throws Exception {
 		SparkSession spark = SparkSession
 			  .builder()
